@@ -31,10 +31,6 @@ export default function Mapgl() {
 
             map.on('click', (e) => console.log(e));
 
-            /**
-             * Ruler  plugin
-             */
-
             const rulerControl = new RulerControl(map, { position: 'centerRight' });
 
             clusterer = new Clusterer(map, {
@@ -129,6 +125,11 @@ export default function Mapgl() {
                 mapglInstance: map,
                 rulerControl,
                 mapgl,
+                clusterer,
+                //@ts-ignore
+                clustererMarkers: markers,
+                heatmapLayer: layer,
+                source: source,
             });
         });
 

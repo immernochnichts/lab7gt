@@ -4,6 +4,7 @@ import { MapglContextProvider } from './MapglContext';
 import ButtonRulerAddPreset from './ButtonRulerAddPreset';
 import ButtonResetMapCenter from './ButtonResetMapCenter';
 import ButtonRulerReset from './ButtonRulerReset';
+import { ToggleClustererButton, ToggleHeatmapButton } from './ToggleVisibilityButtons';
 
 function App() {
     return (
@@ -18,6 +19,12 @@ function App() {
                     </div>
                     <div className='App-button-item'>
                         <ButtonResetMapCenter />
+                    </div>
+                    <div className='App-button-item'>
+                        <ToggleClustererButton />
+                    </div>
+                    <div className='App-button-item'>
+                        <ToggleHeatmapButton />
                     </div>
                 </div>
 
