@@ -7,8 +7,11 @@ import { Directions } from '@2gis/mapgl-directions';
 import { useControlRotateClockwise } from './useControlRotateClockwise';
 import { ControlRotateCounterclockwise } from './ControlRotateConterclockwise';
 import { MapWrapper } from './MapWrapper';
+import { FeatureCollection, Geometry, GeoJsonProperties } from
+'geojson';
+import geoData from './data/leningradskaia-oblast-filtered.json';
 
-export const MAP_CENTER = [55.31878, 25.23584];
+export const MAP_CENTER = [30.360959, 59.931059];
 
 export default function Mapgl() {
     const { setMapglContext } = useMapglContext();
@@ -22,7 +25,8 @@ export default function Mapgl() {
             map = new mapgl.Map('map-container', {
                 center: MAP_CENTER,
                 zoom: 13,
-                key: 'a1893935-6834-4445-b97a-3405fb426c5b',
+                key: '2a469208-3bee-49c1-9528-e52835e98aa6',
+                style: '27cf390d-15c6-4561-a580-a3f4a5086136',
             });
 
             map.on('click', (e) => console.log(e));
@@ -33,34 +37,62 @@ export default function Mapgl() {
 
             const rulerControl = new RulerControl(map, { position: 'centerRight' });
 
-            /**
-             * Clusterer plugin
-             */
-
             clusterer = new Clusterer(map, {
                 radius: 60,
+                clusterStyle: {
+                    labelColor: '#ffffff',
+                    labelFontSize: 14,
+                    icon: 'https://upload.wikimedia.org/wikipedia/commons/d/de/Eo_circle_light-blue_blank.svg',
+                    size: [40, 40]
+                }
             });
 
-            const markers = [
-                { coordinates: [55.27887, 25.21001] },
-                { coordinates: [55.30771, 25.20314] },
-                { coordinates: [55.35266, 25.24382] },
-            ];
+            const markers = [];
+
+            geoData.features.forEach(feature => {
+                const coordinates = feature.geometry.coordinates;
+                const properties = feature.properties;
+
+                markers.push({
+                    coordinates: coordinates,
+                    icon: 'https://upload.wikimedia.org/wikipedia/commons/d/de/Eo_circle_light-blue_blank.svg',
+                    size: [15, 15],
+                    label: {
+                        text: properties.light,
+                        color: '#333333',
+                        offset: [0, -20],
+                        fontSize: 12,
+                        relativeAnchor: [0.5, 0.5],
+                        interactive: true,
+                        minZoom: 12,
+                    },
+                });
+            });
+
             clusterer.load(markers);
 
-            /**
-             * Directions plugin
-             */
-
-            directions = new Directions(map, {
-                directionsApiKey: 'rujany4131', // It's just demo key
+            const source = new mapgl.GeoJsonSource(map, {
+                geoData,
+                attributes: {
+                    visible: true,
+                },
             });
 
-            directions.carRoute({
-                points: [
-                    [55.28273111108218, 25.234131928828333],
-                    [55.35242563034581, 25.23925607042088],
-                ],
+            const layer = {
+                id: 'dtp-data-layer',
+                filter: ['==', ['sourceAttr', 'visible'], true],
+                type: 'point',
+                source: source,
+                style: {
+                    iconImage: ['match', ['get', 'color'],
+                    ['blue'], 'ent_i', 'ent'],
+                    iconWidth: 15,
+                    iconPriority: 100,
+                },
+            };
+
+            map.on('styleload', () => {
+                map?.addLayer(layer);
             });
 
             setMapglContext({
