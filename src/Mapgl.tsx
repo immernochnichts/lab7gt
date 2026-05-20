@@ -47,6 +47,7 @@ export default function Mapgl() {
                 }
             });
 
+            // @ts-ignore
             const markers = [];
 
             geoData.features.forEach(feature => {
@@ -69,25 +70,54 @@ export default function Mapgl() {
                 });
             });
 
+            // @ts-ignore
             clusterer.load(markers);
 
+            const data: FeatureCollection<Geometry, GeoJsonProperties> =
+                geoData as FeatureCollection<Geometry, GeoJsonProperties>;
+
             const source = new mapgl.GeoJsonSource(map, {
-                geoData,
+                data,
                 attributes: {
                     visible: true,
                 },
             });
 
             const layer = {
-                id: 'dtp-data-layer',
-                filter: ['==', ['sourceAttr', 'visible'], true],
-                type: 'point',
+                id: 'dtp-heatmap-layer',
                 source: source,
+                filter: [
+                    'match',
+                    ['sourceAttr', 'visible'],
+                    [true],
+                    true,
+                    false,
+                ],
+                type: 'heatmap',
                 style: {
-                    iconImage: ['match', ['get', 'color'],
-                    ['blue'], 'ent_i', 'ent'],
-                    iconWidth: 15,
-                    iconPriority: 100,
+                color: [
+                    'interpolate',
+                    ['linear'],
+                    ['heatmap-density'],
+                    0,
+                    'rgba(255, 255, 255, 0)',
+                    0.1,
+                    'rgba(200, 240, 255, 0.6)',
+                    0.3,
+                    'rgba(0, 200, 255, 0.8)',
+                    0.5,
+                    'rgba(0, 120, 255, 1)',
+                    0.7,
+                    'rgba(0, 50, 200, 1)',
+                    0.9,
+                    'rgba(0, 20, 120, 1)',
+                    1,
+                    'rgba(0, 10, 60, 1)'
+                ],
+                    radius: 20,
+                    intensity: 0.8,
+                    opacity: 0.8,
+                    downscale: 1,
                 },
             };
 
